@@ -119,7 +119,7 @@ public class JiraSession {
      * @return issues matching the JQL query
      */
     public List<Issue> getIssuesFromJqlSearch(final String jqlSearch) {
-        return service.getIssuesFromJqlSearch(jqlSearch, 50);
+        return service.getIssuesFromJqlSearch(jqlSearch, 500);
     }
 
     /**
