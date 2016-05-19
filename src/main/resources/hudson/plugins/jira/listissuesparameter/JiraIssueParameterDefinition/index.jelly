@@ -15,6 +15,27 @@ limitations under the License.
 -->
 <!-- this is the page fragment displayed when triggering a new build -->
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+   
+   <script type="text/javascript" src="${request.getServletContext().getContextPath()}/plugin/jira/js/jquery/jquery.min.js" />
+
+   <script type="text/javascript">
+   var $j = jQuery.noConflict();
+   var urlBuild="${request.getRequestURLWithQueryString()}";
+   var urlWs = urlBuild.substring(0, urlBuild.indexOf("/build")) + "/ws/arquivos/";
+   
+   var ctx = "${pageContext.request.contextPath}"
+   $j.noConflict();
+   function changeFiles(jira) {
+      if (document.getElementsByTagName('textarea')[0]) {
+          document.getElementsByTagName('textarea')[0].value=''
+          urlJiraFile=urlWs+jira+".files";
+          $j.ajax({url: urlJiraFile, success: function(result){
+              document.getElementsByTagName('textarea')[0].value=result;
+          }});
+      }
+   }
+   </script>
+   
   <f:entry title="${it.name}" description="${it.description}">
     <!-- this div is required because of ParametersDefinitionProperty.java#117 -->
     <div name="parameter">
@@ -27,7 +48,7 @@ limitations under the License.
         </j:when>
         <j:otherwise>
           <!-- everything is fine, we can display the drop-down list to the user -->
-          <select name="value">
+          <select name="value" onchange="changeFiles(this.value);">
             <j:forEach var="issue" items="${it.issues}">
               <option value="${issue.key}">${issue.key}: ${issue.summary}</option>
             </j:forEach>
@@ -36,4 +57,16 @@ limitations under the License.
       </j:choose>
     </div>
   </f:entry>
+   <script type="text/javascript">
+   var $j = jQuery.noConflict();
+   $j(document).ready(function () {
+	   if (document.getElementsByTagName('select')[0]) {
+	       var selectJira = document.getElementsByTagName('select')[0];
+	       if (selectJira.options[0]) {
+		       jira = selectJira.options[0].value;
+	           changeFiles(jira);
+			}
+	    }
+    });
+   </script>
 </j:jelly>
